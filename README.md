@@ -4,7 +4,7 @@ updaterepod is a small application derived from yum and updaterepo.py (https://g
 
 It relies on inotify to watch a defined set of directories for changes (RPM files) and update the repository metadata accordingly.
 
-By design, as updaterepod is largely based on updaterepo.py, only the SQLite databases will be updated upon changes. This massively speed things up.
+By design, as updaterepod is largely based on updaterepo.py, only the SQLite databases will be updated upon changes. This massively speeds things up.
 
 ## Configuration
 By default, the main configuration file is located at /etc/updaterepod/config.yaml.

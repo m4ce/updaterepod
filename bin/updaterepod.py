@@ -9,12 +9,13 @@
 # Author: Matteo Cerutti <matteo.cerutti@hotmail.co.uk>
 #
 
+import os
 import sys
+import pwd
 import pyinotify
 import yaml
 import logging
 import re
-import os
 from optparse import OptionParser
 import signal
 
@@ -669,11 +670,11 @@ def main():
     try:
       uid = pwd.getpwnam(options.user)
     except Exception, e:
-      sys.stderr.write("Failed to look UID for user %s: %s" % (user, e))
+      sys.stderr.write("Failed to look UID for user %s: %s" % (options.user, e))
       sys.exit(1)
  
     try:
-      os.setuid(uid)
+      os.setuid(uid.pw_uid)
     except Exception, e:
       sys.stderr.write("Failed to call setuid: %s" % e)
       sys.exit(1)
@@ -684,7 +685,7 @@ def main():
   else:
     handler = logging.StreamHandler()
   formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(name)s [%(filename)s:%(lineno)s %(funcName)s()]: %(message)s")
-  console.setFormatter(formatter)
+  handler.setFormatter(formatter)
   logger.addHandler(handler)
 
   if options.debug:
