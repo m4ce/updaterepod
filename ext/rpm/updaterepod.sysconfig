@@ -1,0 +1,37 @@
+## Path: System/Packages
+## Description: Updaterepo daemon
+## ServiceReload: updaterepod
+## Type: string
+## Default: root
+#
+# The updaterepo daemon user
+#
+UPDATEREPOD_USER=root
+
+## Type: string
+## Default: "/etc/updaterepod/config.yaml"
+#
+# Main configuration file
+#
+UPDATEREPOD_CONFIG=/etc/updaterepod/config.yaml
+
+## Type: string
+## Default: "/var/log/updaterepod.log"
+#
+# Where to log to.
+#
+UPDATEREPOD_LOG=/var/log/updaterepod.log
+
+## Type: string
+## Default: "/var/run/updaterepod.pid"
+#
+# Where to log to.
+#
+UPDATEREPOD_PID=/var/run/updaterepod.pid
+
+## Type: string
+## Default: 
+#
+# Additional options for systemd
+#
+PDATEREPOD_OPTS="-p $UPDATEREPOD_PID -u $UPDATEREPOD_USER -l $UPDATEREPOD_LOG -c $UPDATEREPOD_CONFIG"

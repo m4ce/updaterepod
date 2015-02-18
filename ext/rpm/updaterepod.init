@@ -1,0 +1,98 @@
+#!/bin/sh
+#
+# Author: Matteo Cerutti <matteo.cerutti@hotmail.co.uk>
+#
+# System startup script for the updaterepo daemon
+#
+### BEGIN INIT INFO
+# Provides: updaterepod
+# Required-Start:
+# Should-Start:
+# Required-Stop:
+# Default-Start: 3 5
+# Default-Stop: 0 1 2 6
+# Description: Updaterepo daemon
+### END INIT INFO
+
+# source SuSE config
+test -s /etc/rc.status && . /etc/rc.status || { echo "Failed to load /etc/rc.status"; exit 1; }
+
+# source our stuff
+test -s /etc/sysconfig/updaterepod && . /etc/sysconfig/updaterepod
+
+UPDATEREPOD_BIN=${UPDATEREPOD_BIN:-/usr/sbin/updaterepod}
+test -x $UPDATEREPOD_BIN || { echo "$UPDATEREPOD_BIN not installed"; [ "$1" = "stop" ] && exit 0 || exit 5; }
+
+UPDATEREPOD_CONFIG=${UPDATEREPOD_CONFIG:-/etc/updaterepod/config.yaml}
+test -n "$UPDATEREPOD_CONFIG" && UPDATEREPOD_OPTS="-c $UPDATEREPOD_CONFIG"
+
+UPDATEREPOD_USER=${UPDATEREPOD_USER:-root}
+test -n "$UPDATEREPOD_USER" && UPDATEREPOD_OPTS="$UPDATEREPOD_OPTS -u $UPDATEREPOD_USER"
+
+UPDATEREPOD_LOG=${UPDATEREPOD_LOG:-/var/log/updaterepod.log}
+test -n "$UPDATEREPOD_LOG" && UPDATEREPOD_OPTS="$UPDATEREPOD_OPTS -l $UPDATEREPOD_LOG"
+
+UPDATEREPOD_PID=${UPDATEREPOD_PID:-/var/run/updaterepod.pid}
+test -n "$UPDATEREPOD_PID" && UPDATEREPOD_OPTS="$UPDATEREPOD_OPTS -p $UPDATEREPOD_PID"
+
+# Shell functions sourced from /etc/rc.status:
+#      rc_check         check and set local and overall rc status
+#      rc_status        check and set local and overall rc status
+#      rc_status -v     ditto but be verbose in local rc status
+#      rc_status -v -r  ditto and clear the local rc status
+#      rc_failed        set local and overall rc status to failed
+#      rc_reset         clear local rc status (overall remains)
+#      rc_exit          exit appropriate to overall rc status
+
+# First reset status of this service
+rc_reset
+
+# Return values acc. to LSB for all commands but status:
+# 0 - success
+# 1 - misc error
+# 2 - invalid or excess args
+# 3 - unimplemented feature (e.g. reload)
+# 4 - insufficient privilege
+# 5 - program not installed
+# 6 - program not configured
+#
+
+case "$1" in
+  start)
+    echo -n "Starting updaterepo daemon"
+
+    startproc -p $UPDATEREPOD_PID $UPDATEREPOD_BIN $UPDATEREPOD_OPTS
+    rc_status -v
+    ;;
+
+  stop)
+    echo -n "Shutting down updaterepo daemon"
+    killproc -p $UPDATEREPOD_PID $UPDATEREPOD_BIN
+    rc_status -v
+    ;;
+
+  restart)
+    ## Stop the service and regardless of whether it was
+    ## running or not, start it again.
+    $0 stop
+    $0 start
+    rc_status
+    ;;
+
+  reload)
+    echo -n "Reloading updaterepo daemon"
+    killproc -SIGHUP -p $UPDATEREPOD_PID $UPDATEREPOD_BIN
+    rc_status -v
+    ;;
+
+  status)
+    echo -n "Checking for updaterepo daemon"
+    checkproc -p $UPDATEREPOD_PID $UPDATEREPOD_BIN
+    rc_status -v
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|status|restart|reload}"
+    exit 1
+esac
+rc_exit

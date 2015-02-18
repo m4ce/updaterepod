@@ -1,0 +1,7 @@
+---
+watch:
+  - "/srv/repo/centos/7/extra/x86_64"
+  - "/srv/repo/centos/7/extra/noarch"
+poll_freq: 0
+coalesce_events: false
+queue_threshold: 0
