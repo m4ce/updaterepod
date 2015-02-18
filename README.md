@@ -6,7 +6,7 @@ It relies on inotify to watch a defined set of directories for changes (RPM file
 
 By design, as updaterepod is largely based on updaterepo.py, only the SQLite databases will be updated upon changes. This massively speeds things up.
 
-## Configuration
+## Usage
 By default, the main configuration file is located at /etc/updaterepod/config.yaml.
 
 Below, the supported options:
@@ -67,3 +67,6 @@ Cleaning repos: extra-basearch extra-i586 extra-noarch os-basearch os-i586 os-no
 test                                                                                                                                                         | 1.3 kB     00:00
 test/primary_db                                                                                                                                              | 2.8 kB     00:00
 ```
+
+## Contact
+Matteo Cerutti - matteo.cerutti@hotmail.co.uk
