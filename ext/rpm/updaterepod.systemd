@@ -4,9 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-EnvironmentFile=-/etc/sysconfig/updaterepod
-ExecStart=/usr/sbin/updaterepod $UPDATEREPOD_OPTS
-ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/sbin/updaterepod -c /etc/updaterepod.conf
 
 [Install]
 WantedBy=multi-user.target

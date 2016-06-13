@@ -539,7 +539,6 @@ class Updaterepo_Daemon:
     self.logger = logging.getLogger("app.Updaterepo_Daemon")
 
     # read configuration file
-    self.pid_file = kwargs['pid_file']
     self.config_file = kwargs['config_file']
 
     self.config = None
@@ -568,11 +567,11 @@ class Updaterepo_Daemon:
     try:
       config = yaml.load(open(self.config_file, 'r'))
     except Exception, e:
-      logger.error("Failed to load %s configuration file: %s" % (self.config_file, e))
+      self.logger.error("Failed to load %s configuration file: %s" % (self.config_file, e))
       sys.exit(1)
 
     if ('watch' not in config) or (config['watch'] is None) or (len(config['watch']) == 0):
-      logger.error("Must specify at least one directory to watch")
+      self.logger.error("Must specify at least one directory to watch")
       sys.exit(1)
 
     if ('coalesce_events' not in config) or (config['coalesce_events'] is None):
@@ -609,8 +608,6 @@ class Updaterepo_Daemon:
     self.logger.debug("Received signal: %s at frame: %s" % (signum, frame))
 
     if signum == signal.SIGTERM:
-      if os.path.isfile(self.pid_file):
-        os.remove(self.pid_file)
       self.logger.info("Requested daemon shutdown ..")
       sys.exit(0)
     elif signum == signal.SIGHUP:
@@ -641,16 +638,9 @@ class Updaterepo_Daemon:
     del(self.wd_fds[path])
 
   def run(self):
-    try:
-      pid = os.getpid()
-      file(self.pid_file, 'w').write(str(pid))
-    except Exception, e:
-      self.logger.error("Failed to write PID file: %s" % e)
-      sys.exit(1)
-
     for path in self.config['watch']:
       self.start_watching(path)
-    self.logger.info("Running (PID = %d)" % pid)
+    self.logger.info("Running ..")
     self.notifier.loop()
 
 def parse_args():
@@ -659,7 +649,6 @@ def parse_args():
   parser.add_option('-d', '--debug', action = "store_false", dest = "debug", default = False, help = "Enable debug mode")
   parser.add_option('-l', '--logdest', dest = "logdest", default = None, help = "Optional destination log file")
   parser.add_option('-u', '--user', dest = "user", default = None, help = "Optional user to run with")
-  parser.add_option('-p', '--pid', dest = "pid_file", default = None, help = "PID file")
 
   return parser.parse_args()
 
@@ -693,7 +682,7 @@ def main():
   else:
     logger.setLevel(logging.INFO)
 
-  updaterepod = Updaterepo_Daemon(config_file=options.config_file, pid_file=options.pid_file)
+  updaterepod = Updaterepo_Daemon(config_file=options.config_file)
   updaterepod.run()
 
 if __name__ == "__main__":
